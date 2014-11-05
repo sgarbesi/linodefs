@@ -1,3 +1,9 @@
+## Install
+
+```
+./setup.py install --user
+```
+
 map linode api entities to a fuse filesystem.
 
 /mnt/lnfs/linodes/
