@@ -120,7 +120,7 @@ class LinodeFS(fuse.Fuse):
 
         if "/" == path:
             try:
-                linode_names = [str(linode.label) for (linode) in
+                linode_names = [linode['LABEL'] for linode in
                     self.api_handle.linode.list()]
 
                 logging.debug("linode names = %s" % linode_names)
