@@ -58,7 +58,7 @@ class LinodeFS(fuse.Fuse):
 
     def get_linode_by_name(self, name):
         linodes = self.get_cached_linodes()
-        return next(linode for linode in linodes if linode.LABEL==name)
+        return next(linode for linode in linodes if linode['LABEL']==name)
 
     @property
     def api_handle(self):
@@ -71,22 +71,22 @@ class LinodeFS(fuse.Fuse):
         linodes = self.get_cached_linodes()
         logging.debug("%s" % linodes)
 
-        return [linode.LABEL for linode in linodes]
+        return [linode['LABEL'] for linode in linodes]
 
     def _get_object(self, path_tokens):
         """Return an object instance from path_tokens (i.e. result
         of path.split('/') or None if object doesn't exist"""
-        container_name, object_name = path_tokens[1], path_tokens[2]
+        linode_name, object_name = path_tokens[1], path_tokens[2]
         try:
-            container = self.api_handle.get_container(container_name)
-            return container.get_object(object_name)
+            linode = self.get_linode_by_name(linode_name)
+            return linode[object_name]
         except (ContainerDoesNotExistError, ObjectDoesNotExistError):
             return None
 
     def getattr(self, path):
         logging.debug("getattr(path='%s')" % path)
 
-        st = CloudStat()
+        st = LinodeFSStats()
 
         if path == '/':
             st.st_mode = stat.S_IFDIR | 0755
@@ -155,10 +155,10 @@ class LinodeFS(fuse.Fuse):
                 return
 
             try:
-                linode_id = path_tokens[1]
-                linode = self.api_handle.linode.list({linodeid:linode_id})
-                dirs = [".", "..","info"] +  [str('disk'+obj.diskid) for disk in
-                        self.api_handle.linode.disk.list({linodeid:linode_id})]
+                linode_name = path_tokens[1]
+                linode = self.get_linode_by_name(linode_name)
+                dirs = [".", "..","info"] +  [str('disk'+obj['DISKID']) for disk in
+                        self.api_handle.linode.disk.list({linodeid:linode['LINODEID']})]
 
                 logging.debug("dirs = %s" % dirs)
 
