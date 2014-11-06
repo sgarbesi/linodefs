@@ -121,7 +121,7 @@ class LinodeFS(fuse.Fuse):
         if "/" == path:
             try:
                 linode_names = [str(linode.label) for (linode) in
-                    self.api_handle.linode.list().data]
+                    self.api_handle.linode.list()]
 
                 logging.debug("linode names = %s" % linode_names)
                 dirs = [".", ".."] + linode_names
@@ -144,7 +144,7 @@ class LinodeFS(fuse.Fuse):
 
             try:
                 linode_id = path_tokens[1]
-                linode = self.api_handle.linode.list(linodeid:linode_id)
+                linode = self.api_handle.linode.list({linodeid:linode_id})
                 dirs = [".", "..","info"] +  [str('disk'+obj.diskid) for disk in
                         self.api_handle.linode.disk.list({linodeid:linode_id})]
 
