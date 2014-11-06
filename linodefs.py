@@ -36,6 +36,7 @@ class LinodeFSStat(fuse.Stat):
 class LinodeFS(fuse.Fuse):
     _api = None
     _objects_to_create = []
+    _linodes = []
 
     def __init__(self, *args, **kwargs):
         fuse.Fuse.__init__(self, *args, **kwargs)
@@ -49,6 +50,16 @@ class LinodeFS(fuse.Fuse):
 
         self._api = Api(self.api_key)
 
+    def get_cached_linodes(self):
+        if not self._linodes:
+            self._linodes = self.api_handle.linode.list()
+
+        return self._linodes
+
+    def get_linode_by_name(self, name):
+        linodes = self.get_cached_linodes()
+        return next(linode for linode in linodes if linode.LABEL==name)
+
     @property
     def api_handle(self):
         if not self._api:
@@ -57,8 +68,10 @@ class LinodeFS(fuse.Fuse):
         return self._api
 
     def _read_linode_names(self):
-        return [container.name for container in
-                self.api_handle.list_containers()]
+        linodes = self.get_cached_linodes()
+        logging.debug("%s" % linodes)
+
+        return [linode.LABEL for linode in linodes]
 
     def _get_object(self, path_tokens):
         """Return an object instance from path_tokens (i.e. result
@@ -120,8 +133,7 @@ class LinodeFS(fuse.Fuse):
 
         if "/" == path:
             try:
-                linode_names = [linode['LABEL'] for linode in
-                    self.api_handle.linode.list()]
+                linode_names = self._read_linode_names()
 
                 logging.debug("linode names = %s" % linode_names)
                 dirs = [".", ".."] + linode_names
@@ -163,9 +175,9 @@ class LinodeFS(fuse.Fuse):
             logging.warning("attempting to create a non-container dir %s" % path)
             return -errno.EOPNOTSUPP
 
-        container_name = path_tokens[1]
+        linode_name = path_tokens[1]
 
-        self.api_handle.create_container(container_name)
+        self.api_handle.linode.create(container_name)
 
         return 0
 
