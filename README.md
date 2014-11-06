@@ -1,3 +1,7 @@
+## Disclaimer
+This is a hobby project so I can learn some Python.  It doesn't work yet.
+I'll remove this disclaimer when this project is functional and maybe a little stable.
+
 ## Purpose
 Maps linode api entities to a fuse filesystem.
 
@@ -21,7 +25,7 @@ tail -f linodefs.log
 
 
 
-### Design
+## Design
 Maybe it will look like this?
 ```
 /mnt/lnfs/linodes/
