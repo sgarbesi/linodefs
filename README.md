@@ -14,6 +14,10 @@ Maps linode api entities to a fuse filesystem.
 
 ```
 
+## Debugging
+```
+tail -f linodefs.log
+```
 
 
 
