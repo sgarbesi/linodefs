@@ -251,10 +251,8 @@ class LinodeFS(fuse.Fuse):
         if 3 != len(path_tokens):
             return -errno.EOPNOTSUPP
 
-        container_name, object_name = path_tokens[1], path_tokens[2]
         try:
-            container = self.api_handle.get_container(container_name)
-            obj = container.get_object(object_name)
+            obj = self._get_object(path_tokens)
         except (ContainerDoesNotExistError, ObjectDoesNotExistError):
             return -errno.ENOENT
 
