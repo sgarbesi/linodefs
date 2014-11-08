@@ -13,7 +13,7 @@ setup(
     license='MIT',
     packages=find_packages(),
     install_requires=['linode'],
-    scripts=['linodefs.py',],
+    scripts=['linodefs.py'],
     classifiers=[
       'Development Status :: 1 - Planning',
       'Intended Audience :: Developers',
